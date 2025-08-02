@@ -1,10 +1,19 @@
 # Delete Operation
 
-## Command
+## Primary Delete Command
 ```python
 from bookshelf.models import Book
 book = Book.objects.get(title="Nineteen Eighty-Four")
 book.delete()
+```
+
+## Alternative Delete Methods
+```python
+# Delete using filter (bulk delete)
+Book.objects.filter(title="Nineteen Eighty-Four").delete()
+
+# Delete by ID
+Book.objects.get(id=1).delete()
 ```
 
 ## Expected Output

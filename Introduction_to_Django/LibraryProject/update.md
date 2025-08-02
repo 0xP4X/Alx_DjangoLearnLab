@@ -1,8 +1,19 @@
 # Update Operation
 
-## Command
+## Primary Update Command
 ```python
 from bookshelf.models import Book
+book = Book.objects.get(title="1984")
+book.title = "Nineteen Eighty-Four"
+book.save()
+```
+
+## Alternative Update Methods
+```python
+# Using update() method for bulk updates
+Book.objects.filter(title="1984").update(title="Nineteen Eighty-Four")
+
+# Using get and save for single object
 book = Book.objects.get(title="1984")
 book.title = "Nineteen Eighty-Four"
 book.save()

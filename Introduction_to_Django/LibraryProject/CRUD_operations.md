@@ -15,10 +15,15 @@ python manage.py shell
 from bookshelf.models import Book
 ```
 
-### Create a new book instance
+### Create a new book instance (Method 1)
 ```python
 book = Book(title="1984", author="George Orwell", publication_year=1949)
 book.save()
+```
+
+### Alternative: Create using objects.create() (Method 2)
+```python
+book = Book.objects.create(title="1984", author="George Orwell", publication_year=1949)
 ```
 
 ### Verify creation

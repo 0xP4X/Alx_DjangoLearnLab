@@ -1,6 +1,6 @@
 # Retrieve Operation
 
-## Command
+## Primary Retrieve Command
 ```python
 from bookshelf.models import Book
 book = Book.objects.get(title="1984")
@@ -27,10 +27,15 @@ print(all_books)
 # Retrieve by ID
 book_by_id = Book.objects.get(id=1)
 print(book_by_id)
+
+# Retrieve using filter
+books = Book.objects.filter(author="George Orwell")
+print(books)
 ```
 
 ## Expected Alternative Output
 ```
 <QuerySet [<Book: 1984>]>
 <Book: 1984>
+<QuerySet [<Book: 1984>]>
 ```
