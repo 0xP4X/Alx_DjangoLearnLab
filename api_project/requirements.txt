@@ -1,0 +1,5 @@
+# Django API Project Requirements
+# Install with: pip install -r requirements.txt
+
+Django>=4.2.0
+djangorestframework>=3.14.0
