@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import ListView, DetailView
-from .models import Book, Library
+from .models import Book
+from .models import Library
 
 # Create your views here.
 
@@ -8,7 +9,7 @@ from .models import Book, Library
 def list_books(request):
     """
     Function-based view that lists all books stored in the database.
-    Renders a simple list of book titles and their authors.
+    This view should render a simple text list of book titles and their authors.
     """
     books = Book.objects.all()
     return render(request, 'relationship_app/list_books.html', {'books': books})
@@ -17,8 +18,9 @@ def list_books(request):
 # Class-based view to display library details
 class LibraryDetailView(DetailView):
     """
-    Class-based view that displays details for a specific library,
+    Create a class-based view in relationship_app/views.py that displays details for a specific library,
     listing all books available in that library.
+    Utilize Django's ListView or DetailView to structure this class-based view.
     """
     model = Library
     template_name = 'relationship_app/library_detail.html'
