@@ -5,34 +5,79 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.urls import reverse_lazy
 from django.forms import ModelForm
 from django.contrib import messages
+from django.db.models import Q
+from django.core.paginator import Paginator
+from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.cache import never_cache
+from django.utils.decorators import method_decorator
+from django.http import Http404
+import logging
+
 from .models import Book
+from .forms import SecureBookForm, SecureSearchForm
+
+# Configure security logging
+logger = logging.getLogger('django.security')
 
 
-# Book Form for CRUD operations
-class BookForm(ModelForm):
-    """Form for creating and editing Book instances"""
-    class Meta:
-        model = Book
-        fields = ['title', 'author', 'publication_year']
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['title'].widget.attrs.update({'class': 'form-control'})
-        self.fields['author'].widget.attrs.update({'class': 'form-control'})
-        self.fields['publication_year'].widget.attrs.update({'class': 'form-control'})
+# Use the secure form for all CRUD operations
+BookForm = SecureBookForm
 
 
 # Permission-protected views using function-based approach
 
 @permission_required('bookshelf.can_view', raise_exception=True)
+@csrf_protect
+@never_cache
 def book_list(request):
     """
-    View to list all books - requires 'can_view' permission.
-    Demonstrates permission enforcement in views using @permission_required decorator.
+    Secure view to list all books with search functionality.
+    Demonstrates permission enforcement and secure data access.
+
+    Security Features:
+    - Permission-based access control
+    - CSRF protection for search forms
+    - Input validation and sanitization
+    - SQL injection prevention via Django ORM
+    - XSS prevention via template escaping
     """
     books = Book.objects.all()
+    search_form = SecureSearchForm()
+    search_query = None
+
+    # Handle secure search functionality
+    if request.method == 'GET' and 'query' in request.GET:
+        search_form = SecureSearchForm(request.GET)
+        if search_form.is_valid():
+            query = search_form.cleaned_data['query']
+            search_type = search_form.cleaned_data['search_type']
+            search_query = query
+
+            # Use Django ORM for secure database queries (prevents SQL injection)
+            if search_type == 'title':
+                books = books.filter(title__icontains=query)
+            elif search_type == 'author':
+                books = books.filter(author__icontains=query)
+            else:  # both
+                books = books.filter(
+                    Q(title__icontains=query) | Q(author__icontains=query)
+                )
+
+            # Log search activity for security monitoring
+            logger.info(f'User {request.user.username} searched for: {query}')
+        else:
+            # Log invalid search attempts
+            logger.warning(f'Invalid search attempt by user {request.user.username}: {request.GET}')
+
+    # Implement pagination for performance and security
+    paginator = Paginator(books, 10)  # Show 10 books per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     return render(request, 'bookshelf/book_list.html', {
-        'books': books,
+        'books': page_obj,
+        'search_form': search_form,
+        'search_query': search_query,
         'title': 'Book Library',
         'user_permissions': {
             'can_view': request.user.has_perm('bookshelf.can_view'),
@@ -44,36 +89,74 @@ def book_list(request):
 
 
 @permission_required('bookshelf.can_view', raise_exception=True)
+@never_cache
 def book_detail(request, pk):
     """
-    View to display book details - requires 'can_view' permission.
-    Example: Use @permission_required('app_name.can_view', raise_exception=True) to protect a view.
+    Secure view to display book details with enhanced security.
+
+    Security Features:
+    - Permission-based access control
+    - Secure object retrieval with 404 handling
+    - Input validation for primary key
+    - Activity logging for security monitoring
     """
-    book = get_object_or_404(Book, pk=pk)
-    return render(request, 'bookshelf/book_detail.html', {
-        'book': book,
-        'title': f'Book: {book.title}',
-        'user_permissions': {
-            'can_view': request.user.has_perm('bookshelf.can_view'),
-            'can_create': request.user.has_perm('bookshelf.can_create'),
-            'can_edit': request.user.has_perm('bookshelf.can_edit'),
-            'can_delete': request.user.has_perm('bookshelf.can_delete'),
-        }
-    })
+    try:
+        # Validate pk parameter to prevent injection
+        pk = int(pk)
+        if pk <= 0:
+            raise Http404("Invalid book ID")
+
+        book = get_object_or_404(Book, pk=pk)
+
+        # Log book access for security monitoring
+        logger.info(f'User {request.user.username} accessed book: {book.title} (ID: {pk})')
+
+        return render(request, 'bookshelf/book_detail.html', {
+            'book': book,
+            'title': f'Book: {book.title}',
+            'user_permissions': {
+                'can_view': request.user.has_perm('bookshelf.can_view'),
+                'can_create': request.user.has_perm('bookshelf.can_create'),
+                'can_edit': request.user.has_perm('bookshelf.can_edit'),
+                'can_delete': request.user.has_perm('bookshelf.can_delete'),
+            }
+        })
+    except (ValueError, TypeError):
+        logger.warning(f'Invalid book ID access attempt by user {request.user.username}: {pk}')
+        raise Http404("Invalid book ID")
 
 
 @permission_required('bookshelf.can_create', raise_exception=True)
+@csrf_protect
 def book_create(request):
     """
-    View to create a new book - requires 'can_create' permission.
-    Ensures views that create model instances check for the correct permissions.
+    Secure view to create a new book with comprehensive validation.
+
+    Security Features:
+    - Permission-based access control
+    - CSRF protection for form submissions
+    - Input validation and sanitization via SecureBookForm
+    - Activity logging for security monitoring
+    - Secure error handling
     """
     if request.method == 'POST':
         form = BookForm(request.POST)
         if form.is_valid():
-            book = form.save()
-            messages.success(request, f'Book "{book.title}" created successfully!')
-            return redirect('book_detail', pk=book.pk)
+            try:
+                book = form.save()
+
+                # Log successful book creation
+                logger.info(f'User {request.user.username} created book: {book.title}')
+
+                messages.success(request, f'Book "{book.title}" created successfully!')
+                return redirect('book_detail', pk=book.pk)
+            except Exception as e:
+                # Log creation errors for security monitoring
+                logger.error(f'Book creation error for user {request.user.username}: {str(e)}')
+                messages.error(request, 'An error occurred while creating the book. Please try again.')
+        else:
+            # Log form validation errors
+            logger.warning(f'Invalid book creation attempt by user {request.user.username}: {form.errors}')
     else:
         form = BookForm()
 

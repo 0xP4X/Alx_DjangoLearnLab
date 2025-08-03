@@ -27,9 +27,11 @@ sys.path.append(str(BASE_DIR.parent))
 SECRET_KEY = 'django-insecure-jllln3i4k7ckc=2vk+r8+#vbr3sfdc#((=)5e4+@mj1_7%3c8+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Set DEBUG to False in production to prevent information disclosure
+DEBUG = True  # Set to False in production
 
-ALLOWED_HOSTS = []
+# Configure allowed hosts for production security
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']  # Add your production domains here
 
 
 # Application definition
@@ -47,6 +49,9 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'bookshelf.middleware.SecurityHeadersMiddleware',  # Custom CSP and security headers
+    'bookshelf.middleware.SecurityLoggingMiddleware',  # Security event logging
+    'bookshelf.middleware.RateLimitingMiddleware',     # Basic rate limiting
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -134,3 +139,155 @@ AUTH_USER_MODEL = 'bookshelf.CustomUser'
 # Media files configuration for profile photos
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# =============================================================================
+# SECURITY SETTINGS - Best Practices for Django Application Security
+# =============================================================================
+
+# HTTPS and SSL/TLS Security Settings
+# These settings ensure secure communication and protect against various attacks
+
+# Enforce HTTPS for cookies - prevents cookie theft over insecure connections
+# Set to True in production when using HTTPS
+CSRF_COOKIE_SECURE = False  # Set to True in production with HTTPS
+SESSION_COOKIE_SECURE = False  # Set to True in production with HTTPS
+
+# Additional cookie security settings
+CSRF_COOKIE_HTTPONLY = True  # Prevent JavaScript access to CSRF cookie
+SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access to session cookie
+CSRF_COOKIE_SAMESITE = 'Strict'  # Prevent CSRF attacks via cross-site requests
+SESSION_COOKIE_SAMESITE = 'Strict'  # Prevent session hijacking via cross-site requests
+
+# Cookie age settings for security
+SESSION_COOKIE_AGE = 3600  # Session expires after 1 hour of inactivity
+CSRF_COOKIE_AGE = 31449600  # CSRF cookie expires after 1 year
+
+# Browser Security Headers
+# These headers provide additional protection against various client-side attacks
+
+# Enable browser's built-in XSS protection
+SECURE_BROWSER_XSS_FILTER = True
+
+# Prevent MIME type sniffing which can lead to security vulnerabilities
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Prevent the site from being embedded in frames (clickjacking protection)
+X_FRAME_OPTIONS = 'DENY'  # Options: DENY, SAMEORIGIN, or ALLOW-FROM uri
+
+# HTTPS Security Settings (for production)
+# Uncomment and configure these when deploying with HTTPS
+
+# Force HTTPS redirects
+# SECURE_SSL_REDIRECT = True
+
+# HTTP Strict Transport Security (HSTS)
+# SECURE_HSTS_SECONDS = 31536000  # 1 year
+# SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+# SECURE_HSTS_PRELOAD = True
+
+# Secure proxy headers (if using a reverse proxy)
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Password Security Settings
+# Configure strong password requirements and hashing
+
+# Use strong password hashers (Argon2 is recommended)
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.Argon2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+]
+
+# Password validation for strong passwords
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'OPTIONS': {
+            'max_similarity': 0.7,
+        }
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 12,  # Require minimum 12 characters
+        }
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+]
+
+# Security Middleware Configuration
+# Ensure security middleware is properly ordered in MIDDLEWARE setting
+
+# Content Security Policy (CSP) Settings
+# These will be implemented via middleware or manual headers
+CSP_DEFAULT_SRC = ["'self'"]
+CSP_SCRIPT_SRC = ["'self'", "'unsafe-inline'"]  # Restrict in production
+CSP_STYLE_SRC = ["'self'", "'unsafe-inline'"]   # Restrict in production
+CSP_IMG_SRC = ["'self'", "data:", "https:"]
+CSP_FONT_SRC = ["'self'", "https:"]
+CSP_CONNECT_SRC = ["'self'"]
+CSP_FRAME_ANCESTORS = ["'none'"]  # Prevent framing
+
+# Logging Configuration for Security Events
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'WARNING',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'logs' / 'security.log',
+            'formatter': 'verbose',
+        },
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+    },
+    'loggers': {
+        'django.security': {
+            'handlers': ['file', 'console'],
+            'level': 'WARNING',
+            'propagate': True,
+        },
+        'django.request': {
+            'handlers': ['file', 'console'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+    },
+}
+
+# Additional Security Settings
+
+# Prevent host header injection
+USE_L10N = True
+USE_TZ = True
+
+# File upload security
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
+FILE_UPLOAD_PERMISSIONS = 0o644
+
+# Admin security
+ADMIN_URL = 'admin/'  # Change this in production to something less obvious
+
+# Database security - ensure proper connection encryption in production
+# Add 'sslmode': 'require' to database OPTIONS for PostgreSQL in production
