@@ -16,6 +16,7 @@ def list_books(request):
 
 
 # Class-based view to display library details
+# Utilize Django's ListView or DetailView to structure this class-based view
 class LibraryDetailView(DetailView):
     """
     Create a class-based view in relationship_app/views.py that displays details for a specific library,
