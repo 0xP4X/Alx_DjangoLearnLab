@@ -1,0 +1,123 @@
+<!-- delete_book.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .header {
+            background-color: #dc3545;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 16px;
+            text-decoration: none;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        .form-actions {
+            margin-top: 30px;
+            text-align: center;
+        }
+        .permission-info {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .book-info {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #dc3545;
+        }
+        .warning-message {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .book-details {
+            margin: 10px 0;
+        }
+        .book-details strong {
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🗑️ {{ title }}</h1>
+        <p>Confirm book deletion</p>
+    </div>
+    
+    <div class="form-container">
+        <div class="permission-info">
+            <strong>Permission Required:</strong> You have the 'can_delete_book' permission to delete books.
+        </div>
+        
+        <div class="warning-message">
+            <strong>⚠️ Warning:</strong> This action cannot be undone. The book will be permanently removed from the library.
+        </div>
+        
+        <div class="book-info">
+            <h3>Book to be deleted:</h3>
+            <div class="book-details">
+                <p><strong>Title:</strong> {{ book.title }}</p>
+                <p><strong>Author:</strong> {{ book.author.name }}</p>
+                <p><strong>Publication Year:</strong> {{ book.publication_year }}</p>
+                <p><strong>Book ID:</strong> {{ book.id }}</p>
+            </div>
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-actions">
+                <button type="submit" class="btn btn-danger">Delete Book</button>
+                <a href="{% url 'list_books' %}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
