@@ -4,6 +4,7 @@ from django.views.generic.detail import DetailView
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.decorators import user_passes_test
 from .models import Book
 from .models import Library
 
@@ -65,3 +66,55 @@ class CustomLogoutView(LogoutView):
     Custom logout view using Django's built-in LogoutView
     """
     template_name = 'relationship_app/logout.html'
+
+
+# Role-based access control helper functions
+
+def is_admin(user):
+    """Check if user has Admin role"""
+    return hasattr(user, 'userprofile') and user.userprofile.role == 'Admin'
+
+
+def is_librarian(user):
+    """Check if user has Librarian role"""
+    return hasattr(user, 'userprofile') and user.userprofile.role == 'Librarian'
+
+
+def is_member(user):
+    """Check if user has Member role"""
+    return hasattr(user, 'userprofile') and user.userprofile.role == 'Member'
+
+
+# Role-based views with access restrictions
+
+@user_passes_test(is_admin)
+def admin_view(request):
+    """
+    Admin view that only users with the 'Admin' role can access
+    """
+    return render(request, 'relationship_app/admin_view.html', {
+        'user': request.user,
+        'role': request.user.userprofile.role if hasattr(request.user, 'userprofile') else 'No Role'
+    })
+
+
+@user_passes_test(is_librarian)
+def librarian_view(request):
+    """
+    Librarian view accessible only to users identified as 'Librarians'
+    """
+    return render(request, 'relationship_app/librarian_view.html', {
+        'user': request.user,
+        'role': request.user.userprofile.role if hasattr(request.user, 'userprofile') else 'No Role'
+    })
+
+
+@user_passes_test(is_member)
+def member_view(request):
+    """
+    Member view for users with the 'Member' role
+    """
+    return render(request, 'relationship_app/member_view.html', {
+        'user': request.user,
+        'role': request.user.userprofile.role if hasattr(request.user, 'userprofile') else 'No Role'
+    })

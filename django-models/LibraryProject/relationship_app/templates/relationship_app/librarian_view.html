@@ -1,0 +1,104 @@
+<!-- librarian_view.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Librarian Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .header {
+            background-color: #28a745;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .user-info {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #28a745;
+        }
+        .librarian-features {
+            list-style-type: none;
+            padding: 0;
+        }
+        .librarian-features li {
+            background-color: #d4edda;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #28a745;
+        }
+        .navigation {
+            margin-top: 30px;
+            text-align: center;
+        }
+        .navigation a {
+            display: inline-block;
+            margin: 0 10px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 3px;
+        }
+        .navigation a:hover {
+            background-color: #0056b3;
+        }
+        .role-badge {
+            background-color: #28a745;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📚 Librarian Dashboard</h1>
+        <p>Library Management System</p>
+    </div>
+    
+    <div class="content">
+        <div class="user-info">
+            <h3>Welcome, {{ user.username }}!</h3>
+            <p><strong>Role:</strong> <span class="role-badge">{{ role }}</span></p>
+            <p><strong>Access Level:</strong> Librarian</p>
+        </div>
+        
+        <h2>Librarian Features</h2>
+        <ul class="librarian-features">
+            <li><strong>Book Catalog Management:</strong> Add, edit, and organize books in the library</li>
+            <li><strong>Member Management:</strong> Register new members and manage member accounts</li>
+            <li><strong>Book Lending:</strong> Check out and return books for library members</li>
+            <li><strong>Inventory Tracking:</strong> Monitor book availability and library inventory</li>
+            <li><strong>Library Reports:</strong> Generate reports on book circulation and member activity</li>
+            <li><strong>Author Management:</strong> Add and manage author information</li>
+            <li><strong>Library Events:</strong> Organize and manage library events and programs</li>
+        </ul>
+        
+        <div class="navigation">
+            <a href="{% url 'list_books' %}">View Books</a>
+            <a href="{% url 'member_view' %}">Member View</a>
+            <a href="{% url 'logout' %}">Logout</a>
+        </div>
+    </div>
+</body>
+</html>
