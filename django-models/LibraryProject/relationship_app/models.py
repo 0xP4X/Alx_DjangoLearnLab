@@ -14,6 +14,7 @@ class Book(models.Model):
     """Book model with title and ForeignKey relationship to Author"""
     title = models.CharField(max_length=200)
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
+    publication_year = models.IntegerField(default=2000)
 
     def __str__(self):
         return self.title
