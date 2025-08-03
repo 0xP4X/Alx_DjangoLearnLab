@@ -14,7 +14,7 @@ from django.http import Http404
 import logging
 
 from .models import Book
-from .forms import SecureBookForm, SecureSearchForm
+from .forms import SecureBookForm, SecureSearchForm, ExampleForm
 
 # Configure security logging
 logger = logging.getLogger('django.security')
