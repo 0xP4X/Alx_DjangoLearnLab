@@ -11,8 +11,13 @@ from . import views
 urlpatterns = [
     # Basic view to test the setup
     path('', views.api_home, name='api_home'),
-    
-    # Future API endpoints (to be implemented with DRF):
-    # path('books/', views.BookListCreateView.as_view(), name='book-list-create'),
+
+    # Temporary basic book list (until DRF is installed)
+    path('books/', views.book_list_basic, name='book-list-basic'),
+
+    # Django REST Framework API endpoints (uncomment after installing DRF):
+    # path('books/', views.BookList.as_view(), name='book-list'),  # Maps to the BookList view
+
+    # Future API endpoints:
     # path('books/<int:pk>/', views.BookDetailView.as_view(), name='book-detail'),
 ]

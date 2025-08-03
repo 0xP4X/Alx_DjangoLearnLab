@@ -1,25 +1,48 @@
 """
 Django REST Framework Serializers for the API app.
-This module will contain serializers for converting model instances to JSON and vice versa.
-
-Note: This file is prepared for Django REST Framework integration.
-Uncomment and modify the code below after installing djangorestframework.
+This module contains serializers for converting model instances to JSON and vice versa.
 """
 
-# from rest_framework import serializers
-# from .models import Book
+from rest_framework import serializers
+from .models import Book
 
 
-# class BookSerializer(serializers.ModelSerializer):
-#     """
-#     Serializer for the Book model.
-#     Handles serialization and deserialization of Book instances for API responses.
-#     """
-#     
-#     class Meta:
-#         model = Book
-#         fields = ['id', 'title', 'author']
-#         read_only_fields = ['id']
+class BookSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the Book model.
+    Handles serialization and deserialization of Book instances for API responses.
+    """
+
+    class Meta:
+        model = Book
+        fields = ['id', 'title', 'author']
+        read_only_fields = ['id']
+
+    def validate_title(self, value):
+        """
+        Custom validation for the title field.
+        Ensures the title is not empty and has a reasonable length.
+        """
+        if not value or len(value.strip()) == 0:
+            raise serializers.ValidationError("Title cannot be empty.")
+
+        if len(value) > 200:
+            raise serializers.ValidationError("Title cannot exceed 200 characters.")
+
+        return value.strip()
+
+    def validate_author(self, value):
+        """
+        Custom validation for the author field.
+        Ensures the author name is not empty and has a reasonable length.
+        """
+        if not value or len(value.strip()) == 0:
+            raise serializers.ValidationError("Author cannot be empty.")
+
+        if len(value) > 100:
+            raise serializers.ValidationError("Author name cannot exceed 100 characters.")
+
+        return value.strip()
 #     
 #     def validate_title(self, value):
 #         """
