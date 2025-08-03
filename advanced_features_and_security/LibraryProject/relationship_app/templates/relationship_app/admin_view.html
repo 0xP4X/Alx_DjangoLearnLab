@@ -1,0 +1,105 @@
+<!-- admin_view.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .header {
+            background-color: #dc3545;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .user-info {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #dc3545;
+        }
+        .admin-features {
+            list-style-type: none;
+            padding: 0;
+        }
+        .admin-features li {
+            background-color: #fff3cd;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #ffc107;
+        }
+        .navigation {
+            margin-top: 30px;
+            text-align: center;
+        }
+        .navigation a {
+            display: inline-block;
+            margin: 0 10px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 3px;
+        }
+        .navigation a:hover {
+            background-color: #0056b3;
+        }
+        .role-badge {
+            background-color: #dc3545;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🛡️ Admin Dashboard</h1>
+        <p>Administrative Control Panel</p>
+    </div>
+    
+    <div class="content">
+        <div class="user-info">
+            <h3>Welcome, {{ user.username }}!</h3>
+            <p><strong>Role:</strong> <span class="role-badge">{{ role }}</span></p>
+            <p><strong>Access Level:</strong> Administrator</p>
+        </div>
+        
+        <h2>Admin Features</h2>
+        <ul class="admin-features">
+            <li><strong>User Management:</strong> Create, modify, and delete user accounts</li>
+            <li><strong>Role Assignment:</strong> Assign and modify user roles (Admin, Librarian, Member)</li>
+            <li><strong>System Configuration:</strong> Configure application settings and preferences</li>
+            <li><strong>Library Management:</strong> Full access to all library operations</li>
+            <li><strong>Book Management:</strong> Add, edit, and remove books from the system</li>
+            <li><strong>Reports & Analytics:</strong> View system usage reports and analytics</li>
+            <li><strong>Security Settings:</strong> Manage security policies and access controls</li>
+        </ul>
+        
+        <div class="navigation">
+            <a href="{% url 'list_books' %}">View Books</a>
+            <a href="{% url 'librarian_view' %}">Librarian View</a>
+            <a href="{% url 'member_view' %}">Member View</a>
+            <a href="{% url 'logout' %}">Logout</a>
+        </div>
+    </div>
+</body>
+</html>

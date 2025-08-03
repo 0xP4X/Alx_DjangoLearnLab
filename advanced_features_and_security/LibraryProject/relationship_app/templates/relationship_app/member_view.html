@@ -1,0 +1,115 @@
+<!-- member_view.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Member Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .user-info {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #007bff;
+        }
+        .member-features {
+            list-style-type: none;
+            padding: 0;
+        }
+        .member-features li {
+            background-color: #cce5ff;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        .navigation {
+            margin-top: 30px;
+            text-align: center;
+        }
+        .navigation a {
+            display: inline-block;
+            margin: 0 10px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 3px;
+        }
+        .navigation a:hover {
+            background-color: #0056b3;
+        }
+        .role-badge {
+            background-color: #007bff;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        .welcome-message {
+            background-color: #e7f3ff;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📖 Member Dashboard</h1>
+        <p>Your Library Portal</p>
+    </div>
+    
+    <div class="content">
+        <div class="user-info">
+            <h3>Welcome, {{ user.username }}!</h3>
+            <p><strong>Role:</strong> <span class="role-badge">{{ role }}</span></p>
+            <p><strong>Access Level:</strong> Library Member</p>
+        </div>
+        
+        <div class="welcome-message">
+            <h3>Welcome to Your Library Portal!</h3>
+            <p>Explore our collection and enjoy your reading journey.</p>
+        </div>
+        
+        <h2>Member Features</h2>
+        <ul class="member-features">
+            <li><strong>Browse Books:</strong> Search and explore our extensive book collection</li>
+            <li><strong>View Book Details:</strong> See detailed information about books and authors</li>
+            <li><strong>Library Catalog:</strong> Access the complete library catalog</li>
+            <li><strong>Reading History:</strong> Track your reading progress and history</li>
+            <li><strong>Book Recommendations:</strong> Discover new books based on your interests</li>
+            <li><strong>Library Events:</strong> Stay updated on library events and programs</li>
+            <li><strong>Account Management:</strong> Update your profile and preferences</li>
+        </ul>
+        
+        <div class="navigation">
+            <a href="{% url 'list_books' %}">Browse Books</a>
+            <a href="{% url 'logout' %}">Logout</a>
+        </div>
+    </div>
+</body>
+</html>
