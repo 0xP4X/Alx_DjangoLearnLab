@@ -1,0 +1,169 @@
+<!-- book_confirm_delete.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .header {
+            background-color: #dc3545;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .delete-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .permission-info {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .warning-box {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ffc107;
+        }
+        .book-info {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #dc3545;
+        }
+        .book-info h3 {
+            margin-top: 0;
+            color: #dc3545;
+        }
+        .info-row {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        .info-label {
+            font-weight: bold;
+            width: 120px;
+            color: #555;
+        }
+        .info-value {
+            flex: 1;
+            color: #333;
+        }
+        .form-actions {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 16px;
+            text-decoration: none;
+            display: inline-block;
+            margin: 0 10px;
+            font-weight: bold;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn:hover {
+            opacity: 0.8;
+        }
+        .danger-text {
+            color: #dc3545;
+            font-weight: bold;
+            font-size: 1.1em;
+            text-align: center;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🗑️ {{ title }}</h1>
+        <p>Confirm Book Deletion</p>
+    </div>
+    
+    <div class="delete-container">
+        <div class="permission-info">
+            <strong>🔒 Permission Required:</strong> 
+            You have the 'can_delete' permission to delete books. This action requires the highest level of access.
+        </div>
+        
+        <div class="warning-box">
+            <strong>⚠️ Warning:</strong> 
+            This action cannot be undone. Once you delete this book, all information will be permanently removed from the system.
+        </div>
+        
+        <div class="book-info">
+            <h3>📚 Book to be Deleted:</h3>
+            
+            <div class="info-row">
+                <div class="info-label">📖 Title:</div>
+                <div class="info-value">{{ book.title }}</div>
+            </div>
+            
+            <div class="info-row">
+                <div class="info-label">✍️ Author:</div>
+                <div class="info-value">{{ book.author }}</div>
+            </div>
+            
+            <div class="info-row">
+                <div class="info-label">📅 Year:</div>
+                <div class="info-value">{{ book.publication_year }}</div>
+            </div>
+            
+            <div class="info-row">
+                <div class="info-label">🆔 ID:</div>
+                <div class="info-value">#{{ book.pk }}</div>
+            </div>
+        </div>
+        
+        <div class="danger-text">
+            ⚠️ Are you sure you want to delete "{{ book.title }}"?
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-actions">
+                <button type="submit" class="btn btn-danger">
+                    🗑️ Yes, Delete Book
+                </button>
+                <a href="{% url 'book_detail' book.pk %}" class="btn btn-secondary">
+                    ❌ Cancel
+                </a>
+            </div>
+        </form>
+        
+        <div style="background-color: #e2e3e5; padding: 15px; border-radius: 5px; margin-top: 20px; text-align: center; color: #6c757d;">
+            <small>
+                💡 <strong>Tip:</strong> You can also manage books through the Django admin interface if you have staff permissions.
+            </small>
+        </div>
+    </div>
+</body>
+</html>

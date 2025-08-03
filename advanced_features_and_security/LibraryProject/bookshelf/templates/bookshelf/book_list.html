@@ -1,0 +1,161 @@
+<!-- book_list.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .permissions-info {
+            background-color: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .permissions-info h3 {
+            margin-top: 0;
+            color: #0056b3;
+        }
+        .permission-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            margin: 2px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        .permission-granted {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .permission-denied {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .actions {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 3px;
+            text-decoration: none;
+            display: inline-block;
+            margin: 0 5px;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn:hover {
+            opacity: 0.8;
+        }
+        .book-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .book-card {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .book-card h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .book-actions {
+            margin-top: 15px;
+        }
+        .book-actions .btn {
+            padding: 5px 10px;
+            font-size: 0.8em;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📚 {{ title }}</h1>
+        <p>Permission-Protected Book Management System</p>
+    </div>
+    
+    <div class="permissions-info">
+        <h3>🔐 Your Permissions:</h3>
+        <span class="permission-badge {% if user_permissions.can_view %}permission-granted{% else %}permission-denied{% endif %}">
+            {% if user_permissions.can_view %}✅{% else %}❌{% endif %} View Books
+        </span>
+        <span class="permission-badge {% if user_permissions.can_create %}permission-granted{% else %}permission-denied{% endif %}">
+            {% if user_permissions.can_create %}✅{% else %}❌{% endif %} Create Books
+        </span>
+        <span class="permission-badge {% if user_permissions.can_edit %}permission-granted{% else %}permission-denied{% endif %}">
+            {% if user_permissions.can_edit %}✅{% else %}❌{% endif %} Edit Books
+        </span>
+        <span class="permission-badge {% if user_permissions.can_delete %}permission-granted{% else %}permission-denied{% endif %}">
+            {% if user_permissions.can_delete %}✅{% else %}❌{% endif %} Delete Books
+        </span>
+    </div>
+    
+    <div class="actions">
+        {% if user_permissions.can_create %}
+            <a href="{% url 'book_create' %}" class="btn btn-success">➕ Add New Book</a>
+        {% endif %}
+        <a href="{% url 'book_list_cbv' %}" class="btn btn-primary">🔄 Class-Based View</a>
+    </div>
+    
+    <div class="book-grid">
+        {% for book in books %}
+        <div class="book-card">
+            <h3>{{ book.title }}</h3>
+            <p><strong>Author:</strong> {{ book.author }}</p>
+            <p><strong>Year:</strong> {{ book.publication_year }}</p>
+            
+            <div class="book-actions">
+                <a href="{% url 'book_detail' book.pk %}" class="btn btn-primary">👁️ View</a>
+                {% if user_permissions.can_edit %}
+                    <a href="{% url 'book_edit' book.pk %}" class="btn btn-warning">✏️ Edit</a>
+                {% endif %}
+                {% if user_permissions.can_delete %}
+                    <a href="{% url 'book_delete' book.pk %}" class="btn btn-danger">🗑️ Delete</a>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="book-card">
+            <h3>No books available</h3>
+            <p>{% if user_permissions.can_create %}Start by adding some books!{% else %}No books to display.{% endif %}</p>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

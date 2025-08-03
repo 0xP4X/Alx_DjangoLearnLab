@@ -1,0 +1,151 @@
+<!-- book_form.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .header {
+            background-color: {% if action == 'Create' %}#28a745{% else %}#ffc107{% endif %};
+            color: {% if action == 'Create' %}white{% else %}#212529{% endif %};
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .permission-info {
+            background-color: {% if action == 'Create' %}#d4edda{% else %}#fff3cd{% endif %};
+            border: 1px solid {% if action == 'Create' %}#c3e6cb{% else %}#ffeaa7{% endif %};
+            color: {% if action == 'Create' %}#155724{% else %}#856404{% endif %};
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 16px;
+        }
+        .form-control:focus {
+            border-color: {% if action == 'Create' %}#28a745{% else %}#ffc107{% endif %};
+            outline: none;
+            box-shadow: 0 0 5px rgba({% if action == 'Create' %}40, 167, 69{% else %}255, 193, 7{% endif %}, 0.3);
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 16px;
+            text-decoration: none;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn:hover {
+            opacity: 0.8;
+        }
+        .form-actions {
+            margin-top: 30px;
+            text-align: center;
+        }
+        .error {
+            color: #dc3545;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>{% if action == 'Create' %}➕{% else %}✏️{% endif %} {{ title }}</h1>
+        <p>{% if action == 'Create' %}Add a new book to the library{% else %}Update book information{% endif %}</p>
+    </div>
+    
+    <div class="form-container">
+        <div class="permission-info">
+            <strong>Permission Required:</strong> 
+            You have the '{% if action == 'Create' %}can_create{% else %}can_edit{% endif %}' permission to {% if action == 'Create' %}create new{% else %}edit existing{% endif %} books.
+        </div>
+        
+        {% if book %}
+        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px; border-left: 4px solid #ffc107;">
+            <h3>Current Book Information:</h3>
+            <p><strong>Title:</strong> {{ book.title }}</p>
+            <p><strong>Author:</strong> {{ book.author }}</p>
+            <p><strong>Publication Year:</strong> {{ book.publication_year }}</p>
+        </div>
+        {% endif %}
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+                {{ form.title }}
+                {% if form.title.errors %}
+                    <div class="error">{{ form.title.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.author.id_for_label }}">{{ form.author.label }}</label>
+                {{ form.author }}
+                {% if form.author.errors %}
+                    <div class="error">{{ form.author.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.publication_year.id_for_label }}">{{ form.publication_year.label }}</label>
+                {{ form.publication_year }}
+                {% if form.publication_year.errors %}
+                    <div class="error">{{ form.publication_year.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn {% if action == 'Create' %}btn-success{% else %}btn-warning{% endif %}">
+                    {% if action == 'Create' %}➕ Create Book{% else %}✏️ Update Book{% endif %}
+                </button>
+                <a href="{% url 'book_list' %}" class="btn btn-secondary">❌ Cancel</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
