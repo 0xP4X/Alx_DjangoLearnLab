@@ -41,21 +41,31 @@ def api_home(request):
 
 
 # Django REST Framework views for API endpoints
-# Note: Uncomment these imports after installing djangorestframework
 # from rest_framework import generics, viewsets
 # from rest_framework.response import Response
 # from .serializers import BookSerializer
 
 
+# # class BookViewSet(viewsets.ModelViewSet):
+#     """
+#     ViewSet for handling Book CRUD operations via API.
+#     Provides list, create, retrieve, update, and delete operations.
+#
+#     This ViewSet automatically provides:
+#     - GET /books/ - List all books
+#     - POST /books/ - Create a new book
+#     - GET /books/{id}/ - Retrieve a specific book
+#     - PUT /books/{id}/ - Update a specific book
+#     - DELETE /books/{id}/ - Delete a specific book
+#     """
+#     queryset = Book.objects.all()
+#     serializer_class = BookSerializer
+
+
 # class BookList(generics.ListAPIView):
 #     """
-#     API view for listing all books.
+#     Alternative API view for listing all books (ListAPIView approach).
 #     GET: Returns a JSON list of all books in the database.
-#
-#     This view extends ListAPIView which provides:
-#     - GET method to retrieve a list of books
-#     - Automatic pagination (if configured)
-#     - Filtering and searching capabilities
 #     """
 #     queryset = Book.objects.all()
 #     serializer_class = BookSerializer
