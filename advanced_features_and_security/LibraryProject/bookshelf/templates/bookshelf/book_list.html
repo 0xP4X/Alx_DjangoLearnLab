@@ -126,11 +126,49 @@
         </span>
     </div>
     
+    <!-- Secure Search Form -->
+    <div class="search-container" style="background-color: white; padding: 20px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px;">
+        <h3>🔍 Search Books</h3>
+        <form method="get" action="">
+            <div style="display: flex; gap: 10px; align-items: end;">
+                <div style="flex: 1;">
+                    <label for="{{ search_form.query.id_for_label }}">Search Query:</label>
+                    {{ search_form.query }}
+                </div>
+                <div style="width: 150px;">
+                    <label for="{{ search_form.search_type.id_for_label }}">Search In:</label>
+                    {{ search_form.search_type }}
+                </div>
+                <div>
+                    <button type="submit" class="btn btn-primary">🔍 Search</button>
+                    {% if search_query %}
+                        <a href="{% url 'book_list' %}" class="btn btn-secondary">❌ Clear</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% if search_form.errors %}
+                <div style="color: #dc3545; margin-top: 10px;">
+                    {% for field, errors in search_form.errors.items %}
+                        {% for error in errors %}
+                            <div>{{ error }}</div>
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </form>
+        {% if search_query %}
+            <div style="margin-top: 10px; color: #28a745;">
+                <strong>Search Results for:</strong> "{{ search_query }}"
+            </div>
+        {% endif %}
+    </div>
+
     <div class="actions">
         {% if user_permissions.can_create %}
             <a href="{% url 'book_create' %}" class="btn btn-success">➕ Add New Book</a>
         {% endif %}
         <a href="{% url 'book_list_cbv' %}" class="btn btn-primary">🔄 Class-Based View</a>
+        <a href="{% url 'form_example' %}" class="btn btn-primary">🔒 Security Example</a>
     </div>
     
     <div class="book-grid">

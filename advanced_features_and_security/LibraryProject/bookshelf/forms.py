@@ -233,3 +233,187 @@ class SecureSearchForm(forms.Form):
                 raise ValidationError('Search query contains potentially malicious content.')
         
         return query
+
+
+class ExampleForm(forms.Form):
+    """
+    Example form demonstrating Django security best practices.
+    This form showcases comprehensive input validation, sanitization,
+    and protection against common web vulnerabilities.
+    """
+
+    # Text field with comprehensive validation
+    name = forms.CharField(
+        max_length=100,
+        min_length=2,
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter your name',
+            'maxlength': 100,
+        }),
+        help_text='Enter your full name (2-100 characters, letters and spaces only)',
+        validators=[
+            RegexValidator(
+                regex=r'^[a-zA-Z\s\-\.]+$',
+                message='Name can only contain letters, spaces, hyphens, and periods.',
+                code='invalid_name'
+            )
+        ]
+    )
+
+    # Email field with built-in validation
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter your email address',
+        }),
+        help_text='Enter a valid email address'
+    )
+
+    # Choice field for security demonstration
+    category = forms.ChoiceField(
+        choices=[
+            ('general', 'General Inquiry'),
+            ('security', 'Security Issue'),
+            ('bug', 'Bug Report'),
+            ('feature', 'Feature Request'),
+        ],
+        required=True,
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        help_text='Select the category of your inquiry'
+    )
+
+    # Textarea with length validation
+    message = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter your message',
+            'rows': 5,
+            'maxlength': 1000,
+        }),
+        max_length=1000,
+        min_length=10,
+        required=True,
+        help_text='Enter your message (10-1000 characters)'
+    )
+
+    # Boolean field for terms acceptance
+    terms_accepted = forms.BooleanField(
+        required=True,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        help_text='You must accept the terms and conditions'
+    )
+
+    def clean_name(self):
+        """
+        Custom validation and sanitization for name field.
+        Demonstrates secure input handling and XSS prevention.
+        """
+        name = self.cleaned_data.get('name')
+
+        if not name:
+            raise ValidationError('Name is required.')
+
+        # Strip HTML tags to prevent XSS
+        name = strip_tags(name).strip()
+
+        # Additional length validation
+        if len(name) < 2:
+            raise ValidationError('Name must be at least 2 characters long.')
+
+        if len(name) > 100:
+            raise ValidationError('Name cannot exceed 100 characters.')
+
+        # Check for valid name format
+        if not re.match(r'^[a-zA-Z\s\-\.]+$', name):
+            raise ValidationError('Name contains invalid characters.')
+
+        # Check for suspicious patterns (XSS prevention)
+        suspicious_patterns = [
+            r'<script.*?>.*?</script>',
+            r'javascript:',
+            r'on\w+\s*=',
+            r'<iframe.*?>',
+        ]
+
+        for pattern in suspicious_patterns:
+            if re.search(pattern, name, re.IGNORECASE):
+                raise ValidationError('Name contains potentially malicious content.')
+
+        return name
+
+    def clean_message(self):
+        """
+        Custom validation and sanitization for message field.
+        Ensures message content is safe and appropriate.
+        """
+        message = self.cleaned_data.get('message')
+
+        if not message:
+            raise ValidationError('Message is required.')
+
+        # Strip HTML tags to prevent XSS
+        message = strip_tags(message).strip()
+
+        # Length validation
+        if len(message) < 10:
+            raise ValidationError('Message must be at least 10 characters long.')
+
+        if len(message) > 1000:
+            raise ValidationError('Message cannot exceed 1000 characters.')
+
+        # Check for spam patterns
+        spam_patterns = [
+            r'\b(viagra|cialis|casino|lottery|winner)\b',
+            r'\b(click here|free money|guaranteed)\b',
+            r'http[s]?://[^\s]+\.[^\s]+',  # URLs (basic detection)
+        ]
+
+        for pattern in spam_patterns:
+            if re.search(pattern, message, re.IGNORECASE):
+                raise ValidationError('Message contains inappropriate content.')
+
+        # Check for injection patterns
+        injection_patterns = [
+            r'\b(union|select|insert|update|delete|drop)\b',
+            r'[\'\"]\s*;\s*',
+            r'--',
+            r'/\*.*?\*/',
+        ]
+
+        for pattern in injection_patterns:
+            if re.search(pattern, message, re.IGNORECASE):
+                raise ValidationError('Message contains potentially malicious content.')
+
+        return message
+
+    def clean(self):
+        """
+        Form-level validation for additional security checks.
+        Performs cross-field validation and final security verification.
+        """
+        cleaned_data = super().clean()
+        name = cleaned_data.get('name')
+        email = cleaned_data.get('email')
+        message = cleaned_data.get('message')
+        terms_accepted = cleaned_data.get('terms_accepted')
+
+        # Ensure terms are accepted
+        if not terms_accepted:
+            raise ValidationError('You must accept the terms and conditions to proceed.')
+
+        # Cross-field validation example
+        if name and email:
+            # Check if name appears to be an email (common mistake)
+            if '@' in name:
+                raise ValidationError('Please enter your name in the name field, not your email.')
+
+        # Additional security check: ensure message doesn't contain personal info
+        if message and email:
+            email_parts = email.split('@')
+            if len(email_parts) > 1 and email_parts[0].lower() in message.lower():
+                self.add_error('message', 'Please avoid including personal information in your message.')
+
+        return cleaned_data

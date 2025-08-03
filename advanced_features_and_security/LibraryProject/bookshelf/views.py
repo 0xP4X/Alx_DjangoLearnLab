@@ -325,3 +325,13 @@ class BookDeleteView(PermissionRequiredMixin, DeleteView):
         response = super().delete(request, *args, **kwargs)
         messages.success(request, f'Book "{book_title}" deleted successfully!')
         return response
+
+
+def form_example(request):
+    """
+    Security demonstration view showing secure form implementation.
+    This view demonstrates various security features and best practices.
+    """
+    return render(request, 'bookshelf/form_example.html', {
+        'title': 'Secure Form Example',
+    })

@@ -14,7 +14,10 @@ urlpatterns = [
     path('book/create/', views.book_create, name='book_create'),
     path('book/<int:pk>/edit/', views.book_edit, name='book_edit'),
     path('book/<int:pk>/delete/', views.book_delete, name='book_delete'),
-    
+
+    # Security demonstration
+    path('form-example/', views.form_example, name='form_example'),
+
     # Class-based views with permission protection (alternative implementation)
     path('cbv/', views.BookListView.as_view(), name='book_list_cbv'),
     path('cbv/book/<int:pk>/', views.BookDetailView.as_view(), name='book_detail_cbv'),
