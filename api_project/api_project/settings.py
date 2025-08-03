@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # 'rest_framework',  # Django REST Framework - install with: pip install djangorestframework
+    # 'rest_framework.authtoken',  # Token authentication
     'api',  # API app for handling API logic
 ]
 
@@ -135,6 +136,7 @@ REST_FRAMEWORK = {
 
     # Default authentication classes
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ],

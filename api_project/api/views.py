@@ -41,25 +41,98 @@ def api_home(request):
 
 
 # Django REST Framework views for API endpoints
-# from rest_framework import generics, viewsets
+# from rest_framework import generics, viewsets, permissions
 # from rest_framework.response import Response
+# from rest_framework.decorators import action
 # from .serializers import BookSerializer
+# from .permissions import IsAuthorOrReadOnly, IsAdminOrReadOnly
 
 
 # # class BookViewSet(viewsets.ModelViewSet):
 #     """
-#     ViewSet for handling Book CRUD operations via API.
+#     ViewSet for handling Book CRUD operations via API with authentication and permissions.
 #     Provides list, create, retrieve, update, and delete operations.
 #
 #     This ViewSet automatically provides:
-#     - GET /books/ - List all books
-#     - POST /books/ - Create a new book
-#     - GET /books/{id}/ - Retrieve a specific book
-#     - PUT /books/{id}/ - Update a specific book
-#     - DELETE /books/{id}/ - Delete a specific book
+#     - GET /books/ - List all books (public access)
+#     - POST /books/ - Create a new book (authenticated users only)
+#     - GET /books/{id}/ - Retrieve a specific book (public access)
+#     - PUT /books/{id}/ - Update a specific book (authenticated users only)
+#     - DELETE /books/{id}/ - Delete a specific book (admin users only)
+#
+#     Authentication: Token, Session, Basic
+#     Permissions: Custom permissions based on action
 #     """
 #     queryset = Book.objects.all()
 #     serializer_class = BookSerializer
+#
+#     def get_permissions(self):
+#         """
+#         Instantiates and returns the list of permissions that this view requires.
+#         Different permissions for different actions.
+#         """
+#         if self.action == 'list' or self.action == 'retrieve':
+#             # Anyone can read books
+#             permission_classes = [permissions.AllowAny]
+#         elif self.action == 'create':
+#             # Only authenticated users can create books
+#             permission_classes = [permissions.IsAuthenticated]
+#         elif self.action == 'update' or self.action == 'partial_update':
+#             # Only authenticated users can update books
+#             permission_classes = [permissions.IsAuthenticated]
+#         elif self.action == 'destroy':
+#             # Only admin users can delete books
+#             permission_classes = [permissions.IsAdminUser]
+#         else:
+#             # Default to authenticated users for custom actions
+#             permission_classes = [permissions.IsAuthenticated]
+#
+#         return [permission() for permission in permission_classes]
+#
+#     @action(detail=False, methods=['get'], permission_classes=[permissions.AllowAny])
+#     def public_books(self, request):
+#         """
+#         Custom action to get public books (no authentication required).
+#         GET /books/public_books/
+#         """
+#         books = self.get_queryset()
+#         serializer = self.get_serializer(books, many=True)
+#         return Response({
+#             'count': books.count(),
+#             'results': serializer.data,
+#             'message': 'Public access to books'
+#         })
+#
+#     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
+#     def my_books(self, request):
+#         """
+#         Custom action to get books for authenticated user.
+#         GET /books/my_books/
+#         Headers: Authorization: Token your_token
+#         """
+#         # For now, return all books since we don't have user-book relationship
+#         books = self.get_queryset()
+#         serializer = self.get_serializer(books, many=True)
+#         return Response({
+#             'count': books.count(),
+#             'results': serializer.data,
+#             'user': request.user.username,
+#             'message': 'Books accessible to authenticated user'
+#         })
+#
+#     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAdminUser])
+#     def admin_stats(self, request):
+#         """
+#         Custom action for admin statistics.
+#         GET /books/admin_stats/
+#         Headers: Authorization: Token admin_token
+#         """
+#         books = self.get_queryset()
+#         return Response({
+#             'total_books': books.count(),
+#             'admin_user': request.user.username,
+#             'message': 'Admin-only statistics'
+#         })
 
 
 # class BookList(generics.ListAPIView):

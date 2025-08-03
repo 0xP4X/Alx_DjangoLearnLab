@@ -17,12 +17,16 @@ urlpatterns = [
     # Basic view to test the setup
     path('', views.api_home, name='api_home'),
 
+    # Authentication endpoints
+    path('auth/', include('api.auth_urls')),
+
     # Temporary basic book list (until DRF is installed)
     path('books/', views.book_list_basic, name='book-list-basic'),
 
     # Django REST Framework API endpoints with DefaultRouter (uncomment after installing DRF)
     # The router URLs will include:
-    # GET/POST /books/ - List/Create books
+    # GET/POST /books/ - List/Create books (with authentication and permissions)
     # GET/PUT/PATCH/DELETE /books/{id}/ - Retrieve/Update/Delete specific book
+    # Custom actions: /books/public_books/, /books/my_books/, /books/admin_stats/
     # path('', include(router.urls)),
 ]
