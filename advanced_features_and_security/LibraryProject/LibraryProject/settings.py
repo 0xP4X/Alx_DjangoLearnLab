@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import sys
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -147,10 +148,31 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # HTTPS and SSL/TLS Security Settings
 # These settings ensure secure communication and protect against various attacks
 
+# =============================================================================
+# HTTPS Configuration - Environment-Based Security Settings
+# =============================================================================
+
+# Environment-based HTTPS configuration
+# Set DJANGO_HTTPS_ENABLED=True in production environment
+HTTPS_ENABLED = os.environ.get('DJANGO_HTTPS_ENABLED', 'False').lower() == 'true'
+
+# =============================================================================
+# Secure Cookie Configuration - HTTPS-Aware Cookie Security
+# =============================================================================
+
 # Enforce HTTPS for cookies - prevents cookie theft over insecure connections
-# Set to True in production when using HTTPS
-CSRF_COOKIE_SECURE = False  # Set to True in production with HTTPS
-SESSION_COOKIE_SECURE = False  # Set to True in production with HTTPS
+# Automatically enabled when HTTPS is configured for the environment
+# Critical for protecting session data and CSRF tokens in transit
+
+# CSRF Cookie Security
+# Ensures CSRF protection cookies are only transmitted over HTTPS
+# Prevents CSRF token interception over insecure connections
+CSRF_COOKIE_SECURE = HTTPS_ENABLED
+
+# Session Cookie Security
+# Ensures session cookies are only transmitted over HTTPS
+# Prevents session hijacking attacks over insecure connections
+SESSION_COOKIE_SECURE = HTTPS_ENABLED
 
 # Additional cookie security settings
 CSRF_COOKIE_HTTPONLY = True  # Prevent JavaScript access to CSRF cookie
@@ -162,31 +184,67 @@ SESSION_COOKIE_SAMESITE = 'Strict'  # Prevent session hijacking via cross-site r
 SESSION_COOKIE_AGE = 3600  # Session expires after 1 hour of inactivity
 CSRF_COOKIE_AGE = 31449600  # CSRF cookie expires after 1 year
 
-# Browser Security Headers
-# These headers provide additional protection against various client-side attacks
+# =============================================================================
+# Secure HTTP Headers - Protection Against Client-Side Attacks
+# =============================================================================
 
-# Enable browser's built-in XSS protection
+# X-XSS-Protection Header
+# Enables the browser's built-in XSS filtering and helps prevent cross-site scripting attacks
+# Modern browsers have this enabled by default, but explicit setting ensures compatibility
+# Value: 1; mode=block (enables XSS filtering and blocks the page if attack detected)
 SECURE_BROWSER_XSS_FILTER = True
 
-# Prevent MIME type sniffing which can lead to security vulnerabilities
+# X-Content-Type-Options Header
+# Prevents browsers from MIME-sniffing a response away from the declared content-type
+# Stops browsers from trying to guess content types, which can lead to security vulnerabilities
+# Value: nosniff (prevents MIME type sniffing)
 SECURE_CONTENT_TYPE_NOSNIFF = True
 
-# Prevent the site from being embedded in frames (clickjacking protection)
-X_FRAME_OPTIONS = 'DENY'  # Options: DENY, SAMEORIGIN, or ALLOW-FROM uri
+# X-Frame-Options Header
+# Prevents the site from being embedded in frames, protecting against clickjacking attacks
+# DENY: The page cannot be displayed in a frame, regardless of the site attempting to do so
+# SAMEORIGIN: The page can only be displayed in a frame on the same origin as the page itself
+# ALLOW-FROM uri: The page can only be displayed in a frame on the specified origin
+X_FRAME_OPTIONS = 'DENY'
 
-# HTTPS Security Settings (for production)
-# Uncomment and configure these when deploying with HTTPS
+# =============================================================================
+# HTTPS Security Settings - Production-Ready HTTPS Configuration
+# =============================================================================
 
-# Force HTTPS redirects
-# SECURE_SSL_REDIRECT = True
+# Force HTTPS redirects for all HTTP requests
+# Redirects all non-HTTPS requests to HTTPS automatically
+# Critical for ensuring all communication is encrypted
+SECURE_SSL_REDIRECT = HTTPS_ENABLED
 
-# HTTP Strict Transport Security (HSTS)
-# SECURE_HSTS_SECONDS = 31536000  # 1 year
-# SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-# SECURE_HSTS_PRELOAD = True
+# HTTP Strict Transport Security (HSTS) Configuration
+# Instructs browsers to only access the site via HTTPS for the specified time
+# Prevents protocol downgrade attacks and cookie hijacking
+SECURE_HSTS_SECONDS = 31536000 if HTTPS_ENABLED else 0  # 1 year (365 days)
 
-# Secure proxy headers (if using a reverse proxy)
-# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# Include all subdomains in the HSTS policy
+# Ensures that all subdomains are also accessed via HTTPS only
+# Provides comprehensive protection across the entire domain
+SECURE_HSTS_INCLUDE_SUBDOMAINS = HTTPS_ENABLED
+
+# Allow the domain to be included in browsers' HSTS preload lists
+# Provides protection even on the first visit to the site
+# Requires submission to browser vendors' preload lists
+SECURE_HSTS_PRELOAD = HTTPS_ENABLED
+
+# Secure proxy headers configuration
+# Required when using reverse proxies (Nginx, Apache, load balancers)
+# Tells Django to trust the X-Forwarded-Proto header from the proxy
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https') if HTTPS_ENABLED else None
+
+# Additional HTTPS Security Settings
+
+# Ensure that Django's CSRF protection isn't accidentally disabled
+# when using HTTPS (should always be True in production)
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
+
+# Referrer Policy for HTTPS
+# Controls how much referrer information is included with requests
+SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
 
 # Password Security Settings
 # Configure strong password requirements and hashing
