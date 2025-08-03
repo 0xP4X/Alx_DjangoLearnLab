@@ -41,8 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'accounts',  # Custom user model app
-    'bookshelf',
+    'bookshelf',  # Contains CustomUser model
     'relationship_app',
 ]
 
@@ -130,7 +129,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Custom User Model Configuration
 # Configure Django to use this custom user model for all user-related functionalities
-AUTH_USER_MODEL = 'accounts.CustomUser'
+AUTH_USER_MODEL = 'bookshelf.CustomUser'
 
 # Media files configuration for profile photos
 MEDIA_URL = '/media/'
